@@ -26,7 +26,7 @@ SECRET_KEY = '^@=^a1=j^8(k@%i3c9mekq$++8u=q7600m25o)$46wmf(-q825'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'accounts.User'
 
