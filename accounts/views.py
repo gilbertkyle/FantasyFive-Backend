@@ -25,22 +25,18 @@ class RegisterView(APIView):
 
             username = data['username']
             password = data['password']
-            re_password = data['re_password']
-
-            if password != re_password:
-                return Response({
-                    "error": "passwords do not match"
-                }, status=status.HTTP_400_BAD_REQUEST)
+            email = data.get('email', '')
 
             if User.objects.filter(username=username).exists():
                 return Response({"error": "A User with that username already exists"}, status=status.HTTP_400_BAD_REQUEST)
             user = User.objects.create_user(
                 username=username,
-                password=password
+                password=password,
+                email=email
             )
             user.save()
             if User.objects.filter(username=username).exists():
-                return Response({"success": "User created successfully"})
+                return Response({"success": "User created successfully"}, status=status.HTTP_201_CREATED)
             else:
                 return Response({"error": 'Something went wrong when creating your account'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
