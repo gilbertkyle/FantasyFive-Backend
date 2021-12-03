@@ -1,5 +1,5 @@
 from rest_framework import routers
-from .views import LeagueViewSet, JoinLeagueView, PickView, PlayerViewSet
+from .views import LeagueViewSet, JoinLeagueView, PickView, PlayerViewSet, WeekView
 from django.urls import path
 
 router = routers.DefaultRouter()
@@ -12,7 +12,8 @@ urlpatterns = [
     path('join', JoinLeagueView.as_view()),
     path('pick/<int:pk>', PickView.as_view()),
     path('player', player_list),
-    path('player/<int:id>', player_detail)
+    path('player/<int:id>', player_detail),
+    path('week', WeekView.as_view())
 ]
 
 urlpatterns += router.urls

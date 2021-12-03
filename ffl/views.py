@@ -5,6 +5,7 @@ from rest_framework import status
 from .models import League, FantasyTeam, Pick, Player
 from .serializers import LeagueDetailSerializer, LeagueSerializer, CreateLeagueSerializer, PickSerializer, PlayerSerializer
 from rest_framework.response import Response
+from .settings import get_week
 import datetime
 
 
@@ -96,3 +97,13 @@ class PlayerViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
     permission_classes = [permissions.AllowAny]
+
+
+class WeekView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        week = get_week()
+        return Response({
+            "week": week
+        })

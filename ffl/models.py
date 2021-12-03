@@ -101,6 +101,7 @@ class League(models.Model):
         team = FantasyTeam()
         team.owner = user
         team.league = self
+        team.name = user.username
         team.save()
         team.create_picks()
         return team
