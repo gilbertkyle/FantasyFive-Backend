@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.hashers import check_password, make_password
-from rest_framework import generics, viewsets, views, permissions
+from rest_framework import generics, serializers, viewsets, views, permissions
 from rest_framework import status
 from .models import League, FantasyTeam, Pick, Player
 from .serializers import LeagueDetailSerializer, LeagueSerializer, CreateLeagueSerializer, PickSerializer, PlayerSerializer
@@ -85,11 +85,13 @@ class PickView(views.APIView):
         return Pick.objects.get(pk=pk)
 
     def patch(self, request, *args, **kwargs):
+        print("got here")
         pick = self.get_object(pk=kwargs.get('pk'))
         serializer = PickSerializer(pick, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        print(serializer.errors)
         return Response(serializer.errors)
 
 

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pick, League, FantasyTeam, Player
+from .models import Pick, League, FantasyTeam, Player, User
 from accounts.serializers import UserSerializer
 
 
@@ -16,9 +16,11 @@ class RegisterLeagueSerializer(serializers.ModelSerializer):
 
 
 class LeagueSerializer(serializers.ModelSerializer):
+    admins = UserSerializer(many=True)
+
     class Meta:
         model = League
-        fields = ['pk', 'name', 'password']
+        fields = ['pk', 'name', 'password', 'admins']
 
 
 class PickSerializer(serializers.ModelSerializer):
@@ -39,10 +41,11 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class LeagueDetailSerializer(serializers.ModelSerializer):
     teams = TeamSerializer(many=True)
+    admins = UserSerializer(many=True)
 
     class Meta:
         model = League
-        fields = ['pk', 'name', 'teams']
+        fields = ['pk', 'name', 'teams', 'admins']
         depth = 2
 
 

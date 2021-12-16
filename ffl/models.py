@@ -39,27 +39,27 @@ class Pick(models.Model):
     week = models.IntegerField()
     season = models.IntegerField(default=datetime.datetime.now().year)
 
-    qb = models.CharField("Quarterback", max_length=25)
+    qb = models.CharField("Quarterback", max_length=25, blank=True)
     qb_id = models.CharField(
         default="", max_length=20, blank=True, null=True)
     qb_points = models.FloatField(default=0.0)
 
-    rb = models.CharField("Running back", max_length=25)
+    rb = models.CharField("Running back", max_length=25, blank=True)
     rb_id = models.CharField(
         default="", max_length=20, blank=True, null=True)
     rb_points = models.FloatField(default=0.0)
 
-    wr = models.CharField("Wide receiver", max_length=25)
+    wr = models.CharField("Wide receiver", max_length=25, blank=True)
     wr_id = models.CharField(
         default="", max_length=20, blank=True, null=True)
     wr_points = models.FloatField(default=0.0)
 
-    te = models.CharField("Tight end", max_length=25)
+    te = models.CharField("Tight end", max_length=25, blank=True)
     te_id = models.CharField(
         default="", max_length=20, blank=True, null=True)
     te_points = models.FloatField(default=0.0)
 
-    defense = models.CharField("Defense", max_length=25)
+    defense = models.CharField("Defense", max_length=25, blank=True)
     defense_id = models.CharField(
         default="", max_length=20, blank=True, null=True)
     defense_points = models.FloatField(default=0.0)
@@ -101,6 +101,7 @@ class League(models.Model):
         team = FantasyTeam()
         team.owner = user
         team.league = self
+        team.save()
         team.name = user.username
         team.save()
         team.create_picks()
