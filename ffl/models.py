@@ -117,15 +117,14 @@ class FantasyTeam(models.Model):
     objects = TeamManager()
 
     def create_picks(self, season=CURRENT_SEASON):
-        if self.picks.filter(season=season).exists():
-            return
 
-        for week in range(1, NUMBER_OF_WEEKS):
-            pick = Pick()
-            pick.team = self
-            pick.week = week
-            pick.season = season
-            pick.save()
+        for week in range(1, NUMBER_OF_WEEKS+1):
+            pick, created = Pick.objects.get_or_create(
+                week=week, season=season, team=self)
+
+            if created:
+                pick.team = self
+                pick.save()
 
     def __str__(self, *args, **kwargs) -> str:
         return f"{self.name}"
