@@ -76,12 +76,17 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
     # send an e-mail to the user
     context = {
         'current_user': reset_password_token.user,
+        'token': reset_password_token.key,
         'username': reset_password_token.user.username,
         'email': reset_password_token.user.email,
-        'reset_password_url': "{}?token={}".format(reverse('password_reset:reset-password-request'), reset_password_token.key),
-        # 'current_site': current_site,
-        'token': reset_password_token.key
+        'reset_password_url': "{}?token={}".format(
+            instance.request.build_absolute_uri(
+                reverse('password_reset:reset-password-confirm')),
+            reset_password_token.key),
+        'frontend_url': 'http://localhost:3000/account/password-set?token={}&username={}'.format(reset_password_token.key, reset_password_token.user.username),
+
     }
+    print(context)
 
     # render email text
     email_html_message = render_to_string(

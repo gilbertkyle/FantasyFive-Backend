@@ -21,6 +21,7 @@ class LeagueSerializer(serializers.ModelSerializer):
     class Meta:
         model = League
         fields = ['pk', 'name', 'password', 'admins']
+        extra_kwargs = {'password': {'write_only': True}}
 
 
 class PickSerializer(serializers.ModelSerializer):
