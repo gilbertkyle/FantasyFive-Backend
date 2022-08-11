@@ -1,9 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.hashers import check_password, make_password
 from rest_framework import generics, serializers, viewsets, views, permissions
 from rest_framework import status
 from .models import League, FantasyTeam, Pick, Player
-from .serializers import LeagueDetailSerializer, LeagueSerializer, CreateLeagueSerializer, PickSerializer, PlayerSerializer
+from .serializers import LeagueDetailSerializer, LeagueSerializer, CreateLeagueSerializer, PickSerializer, PlayerDetailSerializer, PlayerSerializer
 from rest_framework.response import Response
 from .settings import get_week
 import datetime
@@ -85,13 +85,11 @@ class PickView(views.APIView):
         return Pick.objects.get(pk=pk)
 
     def patch(self, request, *args, **kwargs):
-        print("got here")
         pick = self.get_object(pk=kwargs.get('pk'))
         serializer = PickSerializer(pick, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        print(serializer.errors)
         return Response(serializer.errors)
 
 
@@ -99,6 +97,12 @@ class PlayerViewSet(viewsets.ModelViewSet):
     serializer_class = PlayerSerializer
     queryset = Player.objects.all()
     permission_classes = [permissions.AllowAny]
+    lookup_field = "id"
+
+    def retrieve(self, request, id=None):
+        player = get_object_or_404(self.queryset, pk=id)
+        serializer = PlayerDetailSerializer(player)
+        return Response(serializer.data)
 
 
 class WeekView(views.APIView):

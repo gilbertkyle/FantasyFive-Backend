@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pick, League, FantasyTeam, Player, User
+from .models import Pick, League, FantasyTeam, Player, PlayerWeek, User
 from accounts.serializers import UserSerializer
 
 
@@ -51,6 +51,21 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
 
 
 class PlayerSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Player
+        fields = '__all__'
+
+
+class PlayerWeekSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PlayerWeek
+        fields = '__all__'
+
+
+class PlayerDetailSerializer(serializers.ModelSerializer):
+    weeks = PlayerWeekSerializer(many=True)
 
     class Meta:
         model = Player
