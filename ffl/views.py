@@ -98,6 +98,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     permission_classes = [permissions.AllowAny]
     lookup_field = "id"
+    pagination_class = None
 
     def retrieve(self, request, id=None):
         player = get_object_or_404(self.queryset, pk=id)
