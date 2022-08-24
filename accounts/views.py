@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
@@ -86,7 +87,6 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
         'frontend_url': 'http://localhost:3000/account/password-set?token={}&username={}'.format(reset_password_token.key, reset_password_token.user.username),
 
     }
-    print(context)
 
     # render email text
     email_html_message = render_to_string(
@@ -111,3 +111,16 @@ def password_reset_token_created(sender, instance, reset_password_token, *args, 
 @receiver(post_password_reset)
 def post_password_reset(sender, user, *args, **kwargs):
     print("password saved")
+
+
+class UpdatePasswordView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def patch(self, request, *args, **kwargs):
+        body = request.data
+        user = self.request.user
+        if not user.check_password(body["oldPassword"]):
+            raise ValidationError("invalid password")
+        user.set_password(body["newPassword"])
+        user.save()
+        return Response(status=status.HTTP_200_OK)

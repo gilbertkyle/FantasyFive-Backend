@@ -62,7 +62,6 @@ class LeagueViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         user = request.user
-        print(request.data)
         serializer = CreateLeagueSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
