@@ -116,7 +116,7 @@ class FantasyTeam(models.Model):
         League, on_delete=models.CASCADE, related_name="teams")
     objects = TeamManager()
 
-    def create_picks(self, season=CURRENT_SEASON):
+    def _create_picks(self, season=CURRENT_SEASON):
 
         for week in range(1, NUMBER_OF_WEEKS+1):
             pick, created = Pick.objects.get_or_create(

@@ -46,8 +46,11 @@ class RegisterView(APIView):
 
 
 class LoadUserView(APIView):
+    #authentication_classes = ()
+
     def get(self, request, format=None):
         try:
+
             user = request.user
             user = UserSerializer(user)
 
