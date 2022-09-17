@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Pick, League, FantasyTeam, Player, PlayerWeek, User
 from accounts.serializers import UserSerializer
+from .settings import CURRENT_SEASON
 
 
 class CreateLeagueSerializer(serializers.ModelSerializer):
@@ -24,10 +25,18 @@ class LeagueSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
 
+class RecentPickSerializer(serializers.ListSerializer):
+
+    def to_representation(self, data):
+        data = data.filter(season=CURRENT_SEASON)
+        return super(RecentPickSerializer, self).to_representation(data)
+
+
 class PickSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pick
         fields = '__all__'
+        list_serializer_class = RecentPickSerializer
 
 
 class TeamSerializer(serializers.ModelSerializer):
