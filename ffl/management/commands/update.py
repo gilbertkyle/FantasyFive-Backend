@@ -1,7 +1,8 @@
+from turtle import position
 from django.core.management.base import BaseCommand
-from nfldfs import games as games
 from ...models import Player, PlayerWeek, Pick
 from ...settings import CURRENT_SEASON, get_week
+import nfl_data_py as nfl
 
 
 class Command(BaseCommand):
@@ -21,25 +22,27 @@ class Command(BaseCommand):
         self.update_picks(week, season)
 
     def update_players(self, week, season):
+        print(f"week {week} season {season}")
+        data = nfl.import_weekly_data(years=[season], columns=["player_id", "player_name", "week", "position", "recent_team", "fantasy_points", "sacks", "sack_fumbles", "sack_fumbles_lost", "interceptions", "special_teams_tds"])
+        data = data[data["week"] == week]
 
-        g = games.find_games('yh', season, week)
-        stats = games.get_game_data(g)
+        print(nfl.see_weekly_cols())
 
-        for row in stats.itertuples():
+        for index, row in data.iterrows():
             player, created = Player.objects.get_or_create(
-                id=row.Index, defaults={
+                id=row.player_id, defaults={
                     "name": row.player_name,
                     "position": row.position,
-                    "team": row.team_name
+                    "team": row.recent_team
                 }
             )
 
-            player_week, created = PlayerWeek.objects.update_or_create(
+            player_week, created = PlayerWeek.objects.get_or_create(
                 player=player,
                 week=week,
                 season=season,
                 defaults={
-                    "points": row.points
+                    "points": row.fantasy_points
                 }
             )
 

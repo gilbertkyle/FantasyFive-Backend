@@ -131,7 +131,7 @@ class FantasyTeam(models.Model):
 
 
 class Player(models.Model):
-    id = models.CharField('id', max_length=10,
+    id = models.CharField('id', max_length=20,
                           unique=True, primary_key=True)
     name = models.CharField('Name', max_length=30)
     position = models.CharField('Position', max_length=5, default="")

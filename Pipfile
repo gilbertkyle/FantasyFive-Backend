@@ -9,6 +9,12 @@ djangorestframework = "*"
 django-cors-headers = "*"
 djangorestframework-simplejwt = "*"
 django-rest-passwordreset = "*"
+selenium = "*"
+pandas = "*"
+nfl-data-py = "*"
+charset-normalizer = "*"
+bs4 = "*"
+espn-api = "*"
 
 [dev-packages]
 

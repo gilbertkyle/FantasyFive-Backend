@@ -12,7 +12,7 @@ urlpatterns = [
     path('join', JoinLeagueView.as_view()),
     path('pick/<int:pk>', PickView.as_view()),
     path('player', player_list),
-    path('player/<int:id>', player_detail),
+    path('player/<str:id>', player_detail),
     path('week', WeekView.as_view())
 ]
 
