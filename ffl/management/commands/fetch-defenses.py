@@ -3,8 +3,9 @@ from django.core.management.base import BaseCommand
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from ...settings import CURRENT_SEASON, get_week
-from ...models import Player, PlayerWeek
+from ...models import Player, PlayerWeek, Team, Defense
 import nfl_data_py as nfl
+from decimal import Decimal
 
 class Command(BaseCommand):
 
@@ -14,11 +15,32 @@ class Command(BaseCommand):
       parser.add_argument(
             'week', type=int, nargs="?", default=get_week()-1, help="Current week of NFL season")
 
+  def scrape_table(self, table, season, week, *args, **kwargs):
+    for row in table.find_elements(By.TAG_NAME, "tr"):
+      defense = {}
+      points = row.find_element(By.CLASS_NAME, 'pts')
+      player = row.find_element(By.CLASS_NAME, 'player')
+      team_name_full = player.find_element(By.CLASS_NAME, 'name')
+      team_name = team_name_full.find_element(By.XPATH, "following-sibling::*[1]")
+      try:
+        defense["points"] = Decimal(points.text)
+      except:
+        defense["points"] = Decimal(0.0)
+        print(f"No points for {team_name_full}")
+      defense["team_full"] = team_name_full.text
+      defense["team"] = team_name.text.split()[0].upper()
 
-  def fetch_defenses(self, *args, **kwargs):
-    defenses = nfl.import_team_desc()
-    for row, index in defenses.iterrows():
-      continue
+      print(defense)
+
+      try:
+        # check if defense already exists
+        dst = Defense.objects.get(team__team_abbr=defense["team"], season=season, week=week)
+      except:
+        # if defense doesn't exist 
+        team = Team.objects.get(team_abbr=defense["team"])
+        dst = Defense.objects.create(team=team, week=week, season=season, fantasy_points=defense["points"])
+
+      
 
   def handle(self, *args, **kwargs):
         season = kwargs["season"]
@@ -29,42 +51,26 @@ class Command(BaseCommand):
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
         browser = webdriver.Chrome(options=chrome_options)
+
+        url1 = f"https://football.fantasysports.yahoo.com/f1/528/players?&sort=AR&sdir=1&status=ALL&pos=DEF&stat1=S_W_{week}&jsenabled=1"
+        url2 = f"https://football.fantasysports.yahoo.com/f1/528/players?status=ALL&pos=DEF&cut_type=9&stat1=S_W_{week}&myteam=0&sort=AR&sdir=1&count=25"
+
         
         try:
-            browser.get("https://football.fantasysports.yahoo.com/f1/528/players?&sort=AR&sdir=1&status=ALL&pos=DEF&stat1=S_W_3&jsenabled=1")
+          
+            browser.get(url1)
             print("Page title was '{}'".format(browser.title))
             table = browser.find_element(By.ID, "players-table").find_element(By.TAG_NAME, "table").find_element(By.TAG_NAME, 'tbody')
-            count = 0
-            button = browser.find_element(By.CLASS_NAME, 'navlist').find_element(By.TAG_NAME, 'a') 
-            for row in table.find_elements(By.TAG_NAME, "tr"):
-              defense = {}
-              points = row.find_element(By.CLASS_NAME, 'pts')
-              player = row.find_element(By.CLASS_NAME, 'player')
-              team_name_full = player.find_element(By.CLASS_NAME, 'name')
-              team_name = team_name_full.find_element(By.XPATH, "following-sibling::*[1]")
-              defense["points"] = points.text
-              defense["team_full"] = team_name_full.text
-              defense["team"] = team_name.text.split()[0]
+            
+            #button = browser.find_element(By.CLASS_NAME, 'navlist').find_element(By.TAG_NAME, 'a')
+            self.scrape_table(table, season, week)
 
-              print(defense)
-
-              new_player, created = Player.objects.get_or_create(
-                name=defense["team"], defaults={
-                  "position": "DEF"
-                }
-              )
-
-              player_week = PlayerWeek.objects.get_or_create(
-                player=new_player, 
-                week=week,
-                season=season,
-                
-                defaults={
-                  "points": defense["points"]
-                }
-              )
-
+            browser.get(url2)
+            table = browser.find_element(By.ID, "players-table").find_element(By.TAG_NAME, "table").find_element(By.TAG_NAME, 'tbody')
+            self.scrape_table(table, season, week)
+             
         finally:
             browser.quit()
+            
 
     

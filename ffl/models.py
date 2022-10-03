@@ -1,3 +1,4 @@
+from unicodedata import decimal
 from django.db import models, IntegrityError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
@@ -28,8 +29,31 @@ class TeamManager(models.Manager):
         team = self.create()
         team.owner = user
         team.save()
-
         return team
+
+
+class Defense(models.Model):
+    team = models.ForeignKey("Team",to_field="team_id", related_name="defenses", on_delete=models.CASCADE)
+    week = models.IntegerField("Week")
+    season = models.IntegerField("Season", default=CURRENT_SEASON)
+    fantasy_points = models.DecimalField("Fantasy Points", decimal_places=2, max_digits=13)
+
+    def __str__(self) -> str:
+        return f"{self.team.team_name}"
+
+
+class Team(models.Model):
+    team_id = models.IntegerField(primary_key=True)
+    team_abbr = models.CharField("Team Name Abbreviation", default="", max_length=5, null=False, blank=False)
+    team_name = models.CharField("Team Name", default="", max_length=30, null=False, blank=False)
+    team_color = models.CharField("Primary Color", default="", max_length=10)
+    team_color2 = models.CharField("Secondary Color", default="", max_length=10)
+    team_color3 = models.CharField("Tertiary Color", default="", max_length=10)
+    team_color4 = models.CharField("Quaternary Color", default="", max_length=10)
+    team_logo = models.CharField("Team Logo", default="", max_length=250)
+
+    def __str__(self) -> str:
+        return f"{self.team_name}"
 
 
 class Pick(models.Model):
@@ -135,7 +159,7 @@ class Player(models.Model):
                           unique=True, primary_key=True)
     name = models.CharField('Name', max_length=30)
     position = models.CharField('Position', max_length=5, default="")
-    team = models.CharField('Team', max_length=5, default="")
+    team = models.ForeignKey(Team, to_field="team_id", related_name="players", on_delete=models.CASCADE) 
 
     def __str__(self):
         return self.name
