@@ -159,7 +159,7 @@ class Player(models.Model):
                           unique=True, primary_key=True)
     name = models.CharField('Name', max_length=30)
     position = models.CharField('Position', max_length=5, default="")
-    team = models.ForeignKey(Team, to_field="team_id", related_name="players", on_delete=models.CASCADE) 
+    team = models.ForeignKey(Team, to_field="team_id", related_name="players", on_delete=models.CASCADE, default=0) 
 
     def __str__(self):
         return self.name
