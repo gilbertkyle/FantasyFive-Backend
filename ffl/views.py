@@ -18,12 +18,13 @@ class JoinLeagueView(views.APIView):
         """
             NOT DONE
         """
+        print(request.data)
         user = request.user
         try:
-            league = League.objects.get(name=request.data['name'])
+            league = League.objects.get(name=request.data['league'])
 
         except:
-            return Response({'error': f"No League by the name of {request.data['name']}"})
+            return Response({'error': f"No League by the name of {request.data['league']}"})
 
         if check_password(request.data['password'], league.password):
             league.add_team(user)

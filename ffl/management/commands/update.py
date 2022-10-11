@@ -1,6 +1,6 @@
 from turtle import position
 from django.core.management.base import BaseCommand
-from ...models import Player, PlayerWeek, Pick
+from ...models import Player, PlayerWeek, Pick, Team
 from ...settings import CURRENT_SEASON, get_week
 import nfl_data_py as nfl
 
@@ -29,11 +29,16 @@ class Command(BaseCommand):
         print(nfl.see_weekly_cols())
 
         for index, row in data.iterrows():
+            try:
+                team = Team.objects.get(team_abbr=row.recent_team)
+            except:
+                print(row.recent_team)
+                break
             player, created = Player.objects.get_or_create(
                 id=row.player_id, defaults={
                     "name": row.player_name,
                     "position": row.position,
-                    "team": row.recent_team
+                    "team": team
                 }
             )
 

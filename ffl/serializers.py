@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Pick, League, FantasyTeam, Player, PlayerWeek, User
+from .models import Pick, League, FantasyTeam, Player, PlayerWeek, Team, User
 from accounts.serializers import UserSerializer
 from .settings import CURRENT_SEASON
 
@@ -39,7 +39,7 @@ class PickSerializer(serializers.ModelSerializer):
         list_serializer_class = RecentPickSerializer
 
 
-class TeamSerializer(serializers.ModelSerializer):
+class FantasyTeamSerializer(serializers.ModelSerializer):
     owner = UserSerializer()
     picks = PickSerializer(many=True)
 
@@ -50,7 +50,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
 
 class LeagueDetailSerializer(serializers.ModelSerializer):
-    teams = TeamSerializer(many=True)
+    teams = FantasyTeamSerializer(many=True)
     admins = UserSerializer(many=True)
 
     class Meta:
@@ -58,8 +58,14 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
         fields = ['pk', 'name', 'teams', 'admins']
         depth = 2
 
+class TeamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Team
+        fields = "__all__"
 
 class PlayerSerializer(serializers.ModelSerializer):
+    team = TeamSerializer()
 
     class Meta:
         model = Player

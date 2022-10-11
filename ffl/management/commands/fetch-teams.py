@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
   def fetch_defenses(self, *args, **kwargs):
     teams = nfl.import_team_desc()
-    defunct_teams = ["LA", "SD", "OAK", "STL"]
+    defunct_teams = ["LAR", "SD", "OAK", "STL"]
     for index, team in teams.iterrows():
       if team.team_abbr in defunct_teams:
         continue

@@ -39,7 +39,7 @@ class Defense(models.Model):
     fantasy_points = models.DecimalField("Fantasy Points", decimal_places=2, max_digits=13)
 
     def __str__(self) -> str:
-        return f"{self.team.team_name}"
+        return f"{self.team.team_name} Week {self.week} year {self.season}"
 
 
 class Team(models.Model):
@@ -128,7 +128,7 @@ class League(models.Model):
         team.save()
         team.name = user.username
         team.save()
-        team.create_picks()
+        team._create_picks()
         return team
 
 
