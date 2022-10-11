@@ -85,8 +85,11 @@ WSGI_APPLICATION = 'fantasyfive.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.getenv('USERNAME', '') + '$' + 'ffl',
+        'USER': os.getenv('USERNAME', ''),
+        'PASSWORD': os.getenv('MYSQL_PASSWORD', ''),
+        'HOST': os.getenv('MYSQL_HOSTNAME', '')
     }
 }
 
@@ -165,3 +168,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'fantasyfive.helpdesk@gmail.com'
 EMAIL_HOST_PASSWORD = 'correcthorsebatterystapler'
+
+if os.getenv('DJANGO_DEVELOPMENT') == True:
+    from settings_dev import *
