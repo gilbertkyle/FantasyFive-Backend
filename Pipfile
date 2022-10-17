@@ -15,6 +15,7 @@ nfl-data-py = "*"
 charset-normalizer = "*"
 bs4 = "*"
 espn-api = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

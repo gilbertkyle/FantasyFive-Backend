@@ -60,8 +60,7 @@ class Command(BaseCommand):
 
             browser.get(url1)
             print("Page title was '{}'".format(browser.title))
-            table2 = browser.find_element(By.ID, "players-table")
-            print(table2)
+
             table = browser.find_element(By.ID, "players-table").find_element(By.TAG_NAME, "table").find_element(By.TAG_NAME, 'tbody')
 
             #button = browser.find_element(By.CLASS_NAME, 'navlist').find_element(By.TAG_NAME, 'a')
