@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^@=^a1=j^8(k@%i3c9mekq$++8u=q7600m25o)$46wmf(-q825'
+SECRET_KEY = os.getenv('SECRET_KEY', "SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,12 +86,8 @@ WSGI_APPLICATION = 'fantasyfive.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'citizenpain$fantasyfive',
-        'USER': 'citizenpain',
-        'PASSWORD': 'correcthorse',
-        'HOST': "citizenpain.mysql.pythonanywhere-services.com",
-        'PORT': ''
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'mydatabase',
     }
 }
 
@@ -172,7 +168,4 @@ EMAIL_HOST_USER = 'fantasyfive.helpdesk@gmail.com'
 EMAIL_HOST_PASSWORD = 'correcthorsebatterystapler'
 
 if os.getenv('DEVELOPMENT') == "false":
-    print("doo doo butt fart dsfkjdas")
     from .settings_prod import *
-else:
-    print(os.getenv('DEVELOPMENT'))

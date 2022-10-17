@@ -1,4 +1,3 @@
-from turtle import position
 from django.core.management.base import BaseCommand
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -37,7 +36,9 @@ class Command(BaseCommand):
         dst = Defense.objects.get(team__team_abbr=defense["team"], season=season, week=week)
       except:
         # if defense doesn't exist 
-        team = Team.objects.get(team_abbr=defense["team"])
+        team = Team.objects.filter(team_abbr=defense["team"]).first()
+        if team is None:
+          return
         dst = Defense.objects.create(team=team, week=week, season=season, fantasy_points=defense["points"])
 
       
@@ -55,11 +56,13 @@ class Command(BaseCommand):
         url1 = f"https://football.fantasysports.yahoo.com/f1/528/players?&sort=AR&sdir=1&status=ALL&pos=DEF&stat1=S_W_{week}&jsenabled=1"
         url2 = f"https://football.fantasysports.yahoo.com/f1/528/players?status=ALL&pos=DEF&cut_type=9&stat1=S_W_{week}&myteam=0&sort=AR&sdir=1&count=25"
 
-        
+        print(webdriver.__version__)
         try:
           
             browser.get(url1)
             print("Page title was '{}'".format(browser.title))
+            table2 = browser.find_element(By.ID, "players-table")
+            print(table2)
             table = browser.find_element(By.ID, "players-table").find_element(By.TAG_NAME, "table").find_element(By.TAG_NAME, 'tbody')
             
             #button = browser.find_element(By.CLASS_NAME, 'navlist').find_element(By.TAG_NAME, 'a')
@@ -71,6 +74,5 @@ class Command(BaseCommand):
              
         finally:
             browser.quit()
-            
 
-    
+          
