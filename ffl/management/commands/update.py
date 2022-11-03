@@ -52,6 +52,9 @@ class Command(BaseCommand):
             )
 
     def update_picks(self, week, season):
+        """
+            This function is not useful anymore after the model changes to Pick
+        """
         picks = Pick.objects.filter(week=week, season=season)
 
         for pick in picks:
