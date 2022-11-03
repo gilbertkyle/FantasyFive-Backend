@@ -5,6 +5,7 @@ from ...settings import CURRENT_SEASON, get_week
 from ...models import Player, PlayerWeek, Team, Defense
 import nfl_data_py as nfl
 from decimal import Decimal
+from webdriver_manager.chrome import ChromeDriverManager
 
 class Command(BaseCommand):
 
@@ -15,31 +16,36 @@ class Command(BaseCommand):
             'week', type=int, nargs="?", default=get_week()-2, help="Current week of NFL season")
 
   def scrape_table(self, table, season, week, *args, **kwargs):
+    print("length: ", len(table.find_elements(By.TAG_NAME, "tr")))
     for row in table.find_elements(By.TAG_NAME, "tr"):
-      defense = {}
-      points = row.find_element(By.CLASS_NAME, 'pts')
-      player = row.find_element(By.CLASS_NAME, 'player')
-      team_name_full = player.find_element(By.CLASS_NAME, 'name')
-      team_name = team_name_full.find_element(By.XPATH, "following-sibling::*[1]")
       try:
-        defense["points"] = Decimal(points.text)
-      except:
-        defense["points"] = Decimal(0.0)
-        print(f"No points for {team_name_full}")
-      defense["team_full"] = team_name_full.text
-      defense["team"] = team_name.text.split()[0].upper()
+        defense = {}
+        points = row.find_element(By.CLASS_NAME, 'pts')
+        player = row.find_element(By.CLASS_NAME, 'player')
+        team_name_full = player.find_element(By.CLASS_NAME, 'name')
+        team_name = team_name_full.find_element(By.XPATH, "following-sibling::*[1]")
+        try:
+          defense["points"] = Decimal(points.text)
+        except:
+          defense["points"] = Decimal(0.0)
+          print(f"No points for {team_name_full}")
+        defense["team_full"] = team_name_full.text
+        defense["team"] = team_name.text.split()[0].upper()
 
-      print(defense)
+        print(defense)
 
-      try:
-        # check if defense already exists
-        dst = Defense.objects.get(team__team_abbr=defense["team"], season=season, week=week)
+        try:
+          # check if defense already exists
+          dst = Defense.objects.get(team__team_abbr=defense["team"], season=season, week=week)
+        except:
+          # if defense doesn't exist
+          team = Team.objects.filter(team_abbr=defense["team"]).first()
+          if team is None:
+            print("fail: ", defense)
+            continue
+          dst = Defense.objects.create(team=team, week=week, season=season, fantasy_points=defense["points"])
       except:
-        # if defense doesn't exist
-        team = Team.objects.filter(team_abbr=defense["team"]).first()
-        if team is None:
-          return
-        dst = Defense.objects.create(team=team, week=week, season=season, fantasy_points=defense["points"])
+        print("some sort of error???")
 
 
 
@@ -51,7 +57,7 @@ class Command(BaseCommand):
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
-        browser = webdriver.Chrome(options=chrome_options)
+        browser = webdriver.Chrome(ChromeDriverManager(version="107.0.5304.62").install(), options=chrome_options)
 
         url1 = f"https://football.fantasysports.yahoo.com/f1/528/players?&sort=AR&sdir=1&status=ALL&pos=DEF&stat1=S_W_{week}&jsenabled=1"
         url2 = f"https://football.fantasysports.yahoo.com/f1/528/players?status=ALL&pos=DEF&cut_type=9&stat1=S_W_{week}&myteam=0&sort=AR&sdir=1&count=25"
