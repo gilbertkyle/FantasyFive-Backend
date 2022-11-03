@@ -1,3 +1,4 @@
+from click import option
 from django.core.management.base import BaseCommand
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -59,7 +60,11 @@ class Command(BaseCommand):
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
-        browser = webdriver.Chrome(ChromeDriverManager(version=chromedriver_version).install(), options=chrome_options)
+        if os.getenv("CHROMEDRIVER_VERSION"):
+          browser  = webdriver.Chrome(options=chrome_options)   
+        else:
+          browser = webdriver.Chrome(ChromeDriverManager(version=chromedriver_version).install(), options=chrome_options)
+        #browser = webdriver.Chrome(ChromeDriverManager(version=chromedriver_version).install(), options=chrome_options)
 
         url1 = f"https://football.fantasysports.yahoo.com/f1/528/players?&sort=AR&sdir=1&status=ALL&pos=DEF&stat1=S_W_{week}&jsenabled=1"
         url2 = f"https://football.fantasysports.yahoo.com/f1/528/players?status=ALL&pos=DEF&cut_type=9&stat1=S_W_{week}&myteam=0&sort=AR&sdir=1&count=25"
