@@ -19,22 +19,22 @@ class Command(BaseCommand):
         self.stdout.write(f"Season: {season}, Week: {week}")
 
         self.update_players(week, season)
-        self.update_picks(week, season)
+        #self.update_picks(week, season)
 
     def update_players(self, week, season):
         print(f"week {week} season {season}")
         data = nfl.import_weekly_data(years=[season], columns=["player_id", "player_name", "week", "position", "recent_team", "fantasy_points", "sacks", "sack_fumbles", "sack_fumbles_lost", "interceptions", "special_teams_tds"])
-        data = data[data["week"] == week]
-
-        print(nfl.see_weekly_cols())
+        data = data[data["week"] == week] # filters the data down to the current week
 
         for index, row in data.iterrows():
+            if row.player_name == "J.Burrow":
+                print(f"{row.fantasy_points}, {row.week}")
             try:
                 team = Team.objects.get(team_abbr=row.recent_team)
             except:
                 print(row.recent_team)
                 break
-            player, created = Player.objects.get_or_create(
+            player, created = Player.objects.update_or_create(
                 id=row.player_id, defaults={
                     "name": row.player_name,
                     "position": row.position,
@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 }
             )
 
-            player_week, created = PlayerWeek.objects.get_or_create(
+            player_week, created = PlayerWeek.objects.update_or_create(
                 player=player,
                 week=week,
                 season=season,
@@ -52,6 +52,9 @@ class Command(BaseCommand):
             )
 
     def update_picks(self, week, season):
+        """
+            This function is not useful anymore after the model changes to Pick
+        """
         picks = Pick.objects.filter(week=week, season=season)
 
         for pick in picks:
