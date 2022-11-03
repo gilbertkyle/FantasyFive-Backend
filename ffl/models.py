@@ -1,5 +1,4 @@
-from unicodedata import decimal
-from django.db import models, IntegrityError
+from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from .settings import CURRENT_SEASON, NUMBER_OF_WEEKS
