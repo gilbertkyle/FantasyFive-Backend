@@ -6,6 +6,7 @@ from ...models import Player, PlayerWeek, Team, Defense
 import nfl_data_py as nfl
 from decimal import Decimal
 from webdriver_manager.chrome import ChromeDriverManager
+import os
 
 class Command(BaseCommand):
 
@@ -53,11 +54,12 @@ class Command(BaseCommand):
         season = kwargs["season"]
         week = kwargs["week"]
         chrome_options = webdriver.ChromeOptions()
+        chromedriver_version = os.getenv("CHROMEDRIVER_VERSION", "107.0.5304.62")
 
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--disable-gpu")
-        browser = webdriver.Chrome(ChromeDriverManager(version="107.0.5304.62").install(), options=chrome_options)
+        browser = webdriver.Chrome(ChromeDriverManager(version=chromedriver_version).install(), options=chrome_options)
 
         url1 = f"https://football.fantasysports.yahoo.com/f1/528/players?&sort=AR&sdir=1&status=ALL&pos=DEF&stat1=S_W_{week}&jsenabled=1"
         url2 = f"https://football.fantasysports.yahoo.com/f1/528/players?status=ALL&pos=DEF&cut_type=9&stat1=S_W_{week}&myteam=0&sort=AR&sdir=1&count=25"
