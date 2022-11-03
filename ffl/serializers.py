@@ -1,8 +1,22 @@
 from rest_framework import serializers
-from .models import Pick, League, FantasyTeam, Player, PlayerWeek, Team, User
+from .models import Pick, League, FantasyTeam, Player, PlayerWeek, Team, User, Defense
 from accounts.serializers import UserSerializer
 from .settings import CURRENT_SEASON
 
+
+class DefenseSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Defense
+        fields = '__all__'
+        depth = 2
+
+class PlayerWeekSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PlayerWeek
+        fields = '__all__'
+        depth = 2
 
 class CreateLeagueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -26,18 +40,24 @@ class LeagueSerializer(serializers.ModelSerializer):
 
 
 class RecentPickSerializer(serializers.ListSerializer):
-
+    """
+    Serializer that only returns picks from the current season
+    """
     def to_representation(self, data):
         data = data.filter(season=CURRENT_SEASON)
         return super(RecentPickSerializer, self).to_representation(data)
 
-
 class PickSerializer(serializers.ModelSerializer):
+    qb = PlayerWeekSerializer()
+    rb = PlayerWeekSerializer()
+    wr = PlayerWeekSerializer()
+    te = PlayerWeekSerializer()
+    defense = DefenseSerializer()
+
     class Meta:
         model = Pick
         fields = '__all__'
         list_serializer_class = RecentPickSerializer
-
 
 class FantasyTeamSerializer(serializers.ModelSerializer):
     owner = UserSerializer()
@@ -46,8 +66,7 @@ class FantasyTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = FantasyTeam
         fields = ['pk', 'name', 'owner', 'picks']
-        depth = 2
-
+        depth = 3
 
 class LeagueDetailSerializer(serializers.ModelSerializer):
     teams = FantasyTeamSerializer(many=True)
@@ -72,12 +91,6 @@ class PlayerSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class PlayerWeekSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = PlayerWeek
-        fields = '__all__'
-
 
 class PlayerDetailSerializer(serializers.ModelSerializer):
     weeks = PlayerWeekSerializer(many=True)
@@ -85,3 +98,4 @@ class PlayerDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = '__all__'
+

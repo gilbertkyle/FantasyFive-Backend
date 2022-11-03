@@ -1,3 +1,4 @@
+from turtle import ondrag
 from unicodedata import decimal
 from django.db import models, IntegrityError
 from django.contrib.auth import get_user_model
@@ -36,7 +37,7 @@ class Defense(models.Model):
     team = models.ForeignKey("Team",to_field="team_id", related_name="defenses", on_delete=models.CASCADE)
     week = models.IntegerField("Week")
     season = models.IntegerField("Season", default=CURRENT_SEASON)
-    fantasy_points = models.DecimalField("Fantasy Points", decimal_places=2, max_digits=13)
+    fantasy_points = models.DecimalField("Fantasy Points", decimal_places=2, max_digits=13, default=0.0)
 
     def __str__(self) -> str:
         return f"{self.team.team_name} Week {self.week} year {self.season}"
@@ -63,39 +64,31 @@ class Pick(models.Model):
     week = models.IntegerField()
     season = models.IntegerField(default=datetime.datetime.now().year)
 
-    qb = models.CharField("Quarterback", max_length=25, blank=True)
-    qb_id = models.CharField(
-        default="", max_length=20, blank=True, null=True)
-    qb_points = models.FloatField(default=0.0)
+    qb = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="quarterback", null=True)
+    rb = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="running_back", null=True)
+    wr = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="wide_receiver", null=True)
+    te = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="tight_end", null=True)
+    defense = models.ForeignKey("Defense", on_delete=models.SET_NULL, related_name="defense", null=True)
 
-    rb = models.CharField("Running back", max_length=25, blank=True)
-    rb_id = models.CharField(
-        default="", max_length=20, blank=True, null=True)
-    rb_points = models.FloatField(default=0.0)
+   
 
-    wr = models.CharField("Wide receiver", max_length=25, blank=True)
-    wr_id = models.CharField(
-        default="", max_length=20, blank=True, null=True)
-    wr_points = models.FloatField(default=0.0)
-
-    te = models.CharField("Tight end", max_length=25, blank=True)
-    te_id = models.CharField(
-        default="", max_length=20, blank=True, null=True)
-    te_points = models.FloatField(default=0.0)
-
-    defense = models.CharField("Defense", max_length=25, blank=True)
-    defense_id = models.CharField(
-        default="", max_length=20, blank=True, null=True)
-    defense_points = models.FloatField(default=0.0)
-
-    total_points = models.FloatField(default=0.0)
+    """total_points = models.FloatField(default=0.0) """
 
     pick_time = models.DateTimeField('Date Picked', auto_now_add=True)
 
     def __str__(self):
         return f"{self.team}, Week {self.week}"
 
-    def save(self, *args, **kwargs):
+    def total_points(self, *args, **kwargs):
+        return (
+            self.qb.points +
+            self.rb.points +
+            self.wr.points +
+            self.te.points +
+            self.defense.points
+        )
+
+    """ def save(self, *args, **kwargs):
         self.total_points = (
             self.qb_points +
             self.rb_points +
@@ -103,7 +96,7 @@ class Pick(models.Model):
             self.te_points +
             self.defense_points
         )
-        super(Pick, self).save(*args, **kwargs)
+        super(Pick, self).save(*args, **kwargs) """
 
 
 class League(models.Model):
@@ -145,7 +138,6 @@ class FantasyTeam(models.Model):
         for week in range(1, NUMBER_OF_WEEKS+1):
             pick, created = Pick.objects.get_or_create(
                 week=week, season=season, team=self)
-
             if created:
                 pick.team = self
                 pick.save()
@@ -188,4 +180,4 @@ class PlayerWeek(models.Model):
         "Fumble Recovery Touchdowns", default=0)
 
     def __str__(self):
-        return f"{self.player.name}, week {self.week}, {self.year}"
+        return f"{self.player.name}, week {self.week}, {self.season}"
