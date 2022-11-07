@@ -1,4 +1,3 @@
-from turtle import position
 from django.core.management.base import BaseCommand
 from ...models import Player, PlayerWeek, Pick, Team
 from ...settings import CURRENT_SEASON, get_week
