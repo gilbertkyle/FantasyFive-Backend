@@ -38,7 +38,9 @@ class Command(BaseCommand):
 
         try:
           # check if defense already exists
-          dst = Defense.objects.update_or_create(team__team_abbr=defense["team"], season=season, week=week)
+          dst = Defense.objects.update_or_create(team__team_abbr=defense["team"], season=season, week=week, defaults={
+            "fantasy_points": defense["points"]
+          })
         except:
           # if defense doesn't exist
           team = Team.objects.filter(team_abbr=defense["team"]).first()
