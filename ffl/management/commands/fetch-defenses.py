@@ -38,14 +38,14 @@ class Command(BaseCommand):
 
         try:
           # check if defense already exists
-          dst = Defense.objects.get(team__team_abbr=defense["team"], season=season, week=week)
+          dst = Defense.objects.update_or_create(team__team_abbr=defense["team"], season=season, week=week)
         except:
           # if defense doesn't exist
           team = Team.objects.filter(team_abbr=defense["team"]).first()
           if team is None:
             print("fail: ", defense)
             continue
-        dst = Defense.objects.update_or_create(team=team, week=week, season=season, fantasy_points=defense["points"])
+          dst = Defense.objects.update_or_create(team=team, week=week, season=season, fantasy_points=defense["points"])
       except:
         print("some sort of error???")
 
