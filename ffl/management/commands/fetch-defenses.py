@@ -45,7 +45,7 @@ class Command(BaseCommand):
           if team is None:
             print("fail: ", defense)
             continue
-          dst = Defense.objects.update_or_create(team=team, week=week, season=season, fantasy_points=defense["points"])
+        dst = Defense.objects.update_or_create(team=team, week=week, season=season, fantasy_points=defense["points"])
       except:
         print("some sort of error???")
 
