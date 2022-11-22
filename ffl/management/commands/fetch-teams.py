@@ -11,7 +11,7 @@ class Command(BaseCommand):
     for index, team in teams.iterrows():
       if team.team_abbr in defunct_teams:
         continue
-      new_team, created = Team.objects.get_or_create(
+      new_team, created = Team.objects.update_or_create(
         team_id=team.team_id, defaults={
           "team_abbr": team.team_abbr,
           "team_name": team.team_name,

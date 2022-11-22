@@ -15,7 +15,7 @@ class Command(BaseCommand):
       parser.add_argument('season', type=int, nargs="?",
                             default=CURRENT_SEASON, help="Current season of NFL")
       parser.add_argument(
-            'week', type=int, nargs="?", default=get_week()-2, help="Current week of NFL season")
+            'week', type=int, nargs="?", default=get_week()-1, help="Current week of NFL season")
 
   def scrape_table(self, table, season, week, *args, **kwargs):
     print("length: ", len(table.find_elements(By.TAG_NAME, "tr")))
