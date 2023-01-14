@@ -26,8 +26,10 @@ class Command(BaseCommand):
         data = data[data["week"] == week] # filters the data down to the current week
 
         for index, row in data.iterrows():
-            if row.player_name == "J.Burrow":
+            if not row.player_name:
                 print(f"{row.fantasy_points}, {row.week}")
+                print(row)
+                continue
             try:
                 team = Team.objects.get(team_abbr=row.recent_team)
             except:
