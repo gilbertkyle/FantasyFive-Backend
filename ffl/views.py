@@ -133,13 +133,14 @@ class PickView(views.APIView):
             pick.save()
         
         
-        return Response(status=status.HTTP_200_OK)
-        """ serializer = UpdatePickSerializer(pick, data=request.data, partial=True)
+        #return Response(PickSerializer(pick).data, status=status.HTTP_200_OK)
+        serializer = PickSerializer(pick, partial=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
         if serializer.is_valid():
             print("serializer: ", serializer.data)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        print("serializer errors", serializer.errors) """
+        print("serializer errors", serializer.errors)
         #return Response(serializer.errors)
 
 class TeamViewSet(viewsets.ModelViewSet):

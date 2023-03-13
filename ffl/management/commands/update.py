@@ -28,7 +28,6 @@ class Command(BaseCommand):
         for index, row in data.iterrows():
             if not row.player_name:
                 print(f"{row.fantasy_points}, {row.week}")
-                print(row)
                 continue
             try:
                 team = Team.objects.get(team_abbr=row.recent_team)

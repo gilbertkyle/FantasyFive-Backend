@@ -7,7 +7,8 @@ from django.urls import reverse
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
-from .serializers import UserSerializer
+from .serializers import UserSerializer, MyTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from django_rest_passwordreset.signals import reset_password_token_created, post_password_reset
 
@@ -46,7 +47,7 @@ class RegisterView(APIView):
 
 
 class LoadUserView(APIView):
-    #authentication_classes = ()
+    # authentication_classes = ()
 
     def get(self, request, format=None):
         try:
@@ -127,3 +128,7 @@ class UpdatePasswordView(APIView):
         user.set_password(body["newPassword"])
         user.save()
         return Response(status=status.HTTP_200_OK)
+
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
