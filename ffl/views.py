@@ -1,15 +1,26 @@
 from django.shortcuts import get_object_or_404, render
 from django.contrib.auth.hashers import check_password, make_password
-from rest_framework import generics, serializers, viewsets, views, permissions
+from rest_framework import viewsets, views, permissions
 from rest_framework import status
 from .models import League, FantasyTeam, Pick, Player, Team
 from .serializers import LeagueDetailSerializer, LeagueSerializer, CreateLeagueSerializer, PickSerializer, PlayerDetailSerializer, PlayerSerializer, TeamSerializer
 from rest_framework.response import Response
 from .settings import get_week
-import datetime
 
 
 # Create your views here.
+
+class LeagueWeeksView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        week = get_week()
+        league_id = request.query_params.get("leagueId")
+        league = League.objects.get(pk=league_id)
+        picks = Pick.objects.filter(team__league=league, week__lt=week)
+        data = PickSerializer(picks, many=True)
+        
+        return Response(data.data)
 
 
 class JoinLeagueView(views.APIView):
@@ -18,7 +29,6 @@ class JoinLeagueView(views.APIView):
         """
             NOT DONE
         """
-        print(request.data)
         user = request.user
         try:
             league = League.objects.get(name=request.data['league'])

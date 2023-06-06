@@ -4,6 +4,14 @@ from accounts.serializers import UserSerializer
 from .settings import CURRENT_SEASON
 
 
+class FantasyTeamSerializer2(serializers.ModelSerializer):
+    owner = UserSerializer()
+    
+    class Meta:
+        model = FantasyTeam
+        fields = ['pk', 'name', 'owner', 'picks']
+        depth = 3
+
 class DefenseSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -53,6 +61,8 @@ class PickSerializer(serializers.ModelSerializer):
     wr = PlayerWeekSerializer()
     te = PlayerWeekSerializer()
     defense = DefenseSerializer()
+    team = FantasyTeamSerializer2()
+
 
     class Meta:
         model = Pick
@@ -98,4 +108,5 @@ class PlayerDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Player
         fields = '__all__'
+
 

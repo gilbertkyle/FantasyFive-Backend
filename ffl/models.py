@@ -62,15 +62,11 @@ class Pick(models.Model):
     week = models.IntegerField()
     season = models.IntegerField(default=datetime.datetime.now().year)
 
-    qb = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="quarterback", null=True)
+    qb = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="quarterback", null=True, blank=True)
     rb = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="running_back", null=True)
     wr = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="wide_receiver", null=True)
     te = models.ForeignKey("PlayerWeek", on_delete=models.SET_NULL, related_name="tight_end", null=True)
     defense = models.ForeignKey("Defense", on_delete=models.SET_NULL, related_name="defense", null=True)
-
-   
-
-    """total_points = models.FloatField(default=0.0) """
 
     pick_time = models.DateTimeField('Date Picked', auto_now_add=True)
 
