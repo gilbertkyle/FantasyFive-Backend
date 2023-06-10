@@ -9,6 +9,7 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from .serializers import UserSerializer, MyTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from django_rest_passwordreset.signals import reset_password_token_created, post_password_reset
 
@@ -37,8 +38,14 @@ class RegisterView(APIView):
                 email=email
             )
             user.save()
+            refresh = MyTokenObtainPairSerializer().get_token(user) # gets updated tokens with user info
+            
+            
             if User.objects.filter(username=username).exists():
-                return Response({"success": "User created successfully"}, status=status.HTTP_201_CREATED)
+                return Response({
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token)
+                }, status=status.HTTP_201_CREATED)
             else:
                 return Response({"error": 'Something went wrong when creating your account'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
