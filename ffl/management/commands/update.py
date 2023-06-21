@@ -16,7 +16,6 @@ class Command(BaseCommand):
         season = kwargs['season']
         week = kwargs['week']
         self.stdout.write(f"Season: {season}, Week: {week}")
-        print("hello")
 
         self.update_players(week, season)
         #self.update_picks(week, season)
