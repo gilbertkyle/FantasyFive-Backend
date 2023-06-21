@@ -40,7 +40,7 @@ class RegisterView(APIView):
             user.save()
             refresh = MyTokenObtainPairSerializer().get_token(user) # gets updated tokens with user info
             
-            
+            # final confirmation the user exists
             if User.objects.filter(username=username).exists():
                 return Response({
                     "refresh": str(refresh),
