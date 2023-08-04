@@ -1,11 +1,12 @@
-from django.shortcuts import get_object_or_404, render
-from django.contrib.auth.hashers import check_password, make_password
-from rest_framework import viewsets, views, permissions
-from rest_framework import status
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.hashers import check_password
+from rest_framework import viewsets, views, permissions, status
 from .models import League, FantasyTeam, Pick, Player, Team
 from .serializers import LeagueDetailSerializer, LeagueSerializer, CreateLeagueSerializer, PickSerializer, PlayerDetailSerializer, PlayerSerializer, TeamSerializer
 from rest_framework.response import Response
 from .settings import get_week
+from rest_framework.pagination import PageNumberPagination
+from pprint import pprint
 
 
 # Create your views here.
@@ -97,54 +98,84 @@ class PickView(views.APIView):
         return Pick.objects.get(pk=pk)
 
     def patch(self, request, *args, **kwargs):
-        pick = self.get_object(pk=kwargs.get('pk'))
+        my_pick = self.get_object(pk=kwargs.get('pk'))
+        errors = [] # error list for sending back to the client
 
-        week = pick.week
-        season = pick.season
+        week = my_pick.week
+        season = my_pick.season
 
+        # get picks from the whole season, if player has already been picked, return an error
+        fantasy_team = FantasyTeam.objects.get(pk=my_pick.team.id)
+        picks = fantasy_team.picks.filter(season=season)
         # Quarterback
         qb_id = request.data.get('qb_id', '')
         if qb_id:
+            for pick in picks:
+                 # check if qb_id is in any of these picks
+                 if pick.qb and qb_id == pick.qb.player.id:
+                     
+                     errors.append()
+                
             qb_week = Player.objects.get(pk=qb_id).weeks.get_or_create(week=week, season=season)[0]
             qb_week.save()
-            pick.qb = qb_week
-            pick.save()
+             
+            my_pick.qb = qb_week
+            my_pick.save()
 
         # Running Back
         rb_id = request.data.get('rb_id', '')
         if rb_id:
+            for pick in picks:
+                 # check if qb_id is in any of these picks
+                 if pick.rb and rb_id == pick.rb.player.id:
+                     return Response(status=status.HTTP_400_BAD_REQUEST)
             rb_week = Player.objects.get(pk=rb_id).weeks.get_or_create(week=week, season=season)[0]
             rb_week.save()
-            pick.rb = rb_week
-            pick.save()
+            my_pick.rb = rb_week
+            my_pick.save()
 
         # Wide Receiver
         wr_id = request.data.get('wr_id', '')
         if wr_id:
+            for pick in picks:
+                 # check if qb_id is in any of these picks
+                 if pick.wr and wr_id == pick.wr.player.id:
+                     return Response(status=status.HTTP_400_BAD_REQUEST)
             wr_week = Player.objects.get(pk=wr_id).weeks.get_or_create(week=week, season=season)[0]
             wr_week.save()
-            pick.wr =wr_week
-            pick.save()
+            my_pick.wr =wr_week
+            my_pick.save()
 
         # Tight End 
         te_id = request.data.get('te_id', '')
         if te_id:
+            for pick in picks:
+                 # check if qb_id is in any of these picks
+                 if pick.te and te_id == pick.te.player.id:
+                     return Response(status=status.HTTP_400_BAD_REQUEST)
             te_week = Player.objects.get(pk=te_id).weeks.get_or_create(week=week, season=season)[0]
             te_week.save()
-            pick.te = te_week
-            pick.save()
+            my_pick.te = te_week
+            my_pick.save()
 
         # Defense
         defense_id = request.data.get('defense_id', '')
         if defense_id:
+            print("defense: ", my_pick.defense.team.team_name)
+            """ for pick in picks:
+                 # check if qb_id is in any of these picks
+                 if pick.defense and defense_id == pick.defense.player.id:
+                     print("hey")
+                     return Response(status=status.HTTP_400_BAD_REQUEST) """
             defense_week = Team.objects.get(pk=defense_id).defenses.get_or_create(week=week, season=season)[0]
             defense_week.save()
-            pick.defense = defense_week
-            pick.save()
+            my_pick.defense = defense_week
+            my_pick.save()
+
         
         
         #return Response(PickSerializer(pick).data, status=status.HTTP_200_OK)
-        serializer = PickSerializer(pick, partial=True)
+        serializer = PickSerializer(my_pick, partial=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
         if serializer.is_valid():
             print("serializer: ", serializer.data)
@@ -170,13 +201,26 @@ class PlayerViewSet(viewsets.ModelViewSet):
     queryset = Player.objects.all()
     permission_classes = [permissions.AllowAny]
     lookup_field = "id"
-    pagination_class = None
+    pagination_class = PageNumberPagination
 
     def retrieve(self, request, id=None):
         player = get_object_or_404(self.queryset, pk=id)
         serializer = PlayerDetailSerializer(player)
         return Response(serializer.data)
+    
+class ACPlayerViewSet(viewsets.ModelViewSet):
+    serializer_class = PlayerSerializer
+    queryset = Player.objects.all()
+    permission_classes=[permissions.AllowAny]
+    pagination_class = None
+    lookup_field = "id"
 
+    def list(self, request):
+        qs = self.get_queryset()
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+        
 
 class WeekView(views.APIView):
     permission_classes = [permissions.AllowAny]
