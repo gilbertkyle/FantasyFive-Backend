@@ -3,6 +3,19 @@ from .models import Pick, League, FantasyTeam, Player, PlayerWeek, Team, User, D
 from accounts.serializers import UserSerializer
 from .settings import CURRENT_SEASON
 
+class TeamSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Team
+        fields = "__all__"
+
+class PlayerSerializer(serializers.ModelSerializer):
+    team = TeamSerializer()
+
+    class Meta:
+        model = Player
+        fields = ["id", "name", "position", "team"]
+
 
 class FantasyTeamSerializer2(serializers.ModelSerializer):
     owner = UserSerializer()
@@ -10,21 +23,23 @@ class FantasyTeamSerializer2(serializers.ModelSerializer):
     class Meta:
         model = FantasyTeam
         fields = ['pk', 'name', 'owner', 'picks']
-        depth = 3
+        depth = 2
 
 class DefenseSerializer(serializers.ModelSerializer):
+    team = TeamSerializer()
 
     class Meta:
         model = Defense
         fields = '__all__'
-        depth = 2
+        #depth = 2
 
 class PlayerWeekSerializer(serializers.ModelSerializer):
+    player = PlayerSerializer()
 
     class Meta:
         model = PlayerWeek
         fields = '__all__'
-        depth = 2
+        #depth = 2
 
 class CreateLeagueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,13 +76,16 @@ class PickSerializer(serializers.ModelSerializer):
     wr = PlayerWeekSerializer()
     te = PlayerWeekSerializer()
     defense = DefenseSerializer()
-    team = FantasyTeamSerializer2()
+    #team = FantasyTeamSerializer2()
 
 
     class Meta:
         model = Pick
-        fields = '__all__'
+        fields = ["id", "qb", "rb", "wr", "te", "defense", "week", "season", "pick_time"]
         list_serializer_class = RecentPickSerializer
+
+
+
 
 class FantasyTeamSerializer(serializers.ModelSerializer):
     owner = UserSerializer()
@@ -76,7 +94,7 @@ class FantasyTeamSerializer(serializers.ModelSerializer):
     class Meta:
         model = FantasyTeam
         fields = ['pk', 'name', 'owner', 'picks']
-        depth = 3
+        #depth = 2
 
 class LeagueDetailSerializer(serializers.ModelSerializer):
     teams = FantasyTeamSerializer(many=True)
@@ -85,20 +103,7 @@ class LeagueDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = League
         fields = ['pk', 'name', 'teams', 'admins']
-        depth = 2
-
-class TeamSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Team
-        fields = "__all__"
-
-class PlayerSerializer(serializers.ModelSerializer):
-    team = TeamSerializer()
-
-    class Meta:
-        model = Player
-        fields = '__all__'
+        # depth = 2
 
 
 

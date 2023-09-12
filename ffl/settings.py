@@ -7,11 +7,11 @@ from pytz import timezone
 
 TIME_ZONE = timezone("US/Pacific")
 # BASE_DATE should be 14 days before Sunday of week 1
-BASE_DATE = datetime.datetime(2022, 8, 29, 10, 0, 0, tzinfo=TIME_ZONE)
+BASE_DATE = datetime.datetime(2022, 8, 27, 10, 0, 0, tzinfo=TIME_ZONE)
 
 NUMBER_OF_WEEKS = 18
 
-CURRENT_SEASON = 2022
+CURRENT_SEASON = 2023
 
 
 def get_week():

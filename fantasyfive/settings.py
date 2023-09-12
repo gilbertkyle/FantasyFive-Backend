@@ -165,7 +165,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'fantasyfive.helpdesk@gmail.com'
-EMAIL_HOST_PASSWORD = 'correcthorsebatterystapler'
+EMAIL_HOST_PASSWORD = 'hravobnxgypsxaut'
 
 if os.getenv('DEVELOPMENT') == "false":
     from .settings_prod import *

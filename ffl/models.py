@@ -35,7 +35,7 @@ class Defense(models.Model):
     team = models.ForeignKey("Team",to_field="team_id", related_name="defenses", on_delete=models.CASCADE)
     week = models.IntegerField("Week")
     season = models.IntegerField("Season", default=CURRENT_SEASON)
-    fantasy_points = models.DecimalField("Fantasy Points", decimal_places=2, max_digits=13, default=0.0)
+    fantasy_points = models.FloatField("Fantasy Points", default=0.0)
 
     def __str__(self) -> str:
         return f"{self.team.team_name} Week {self.week} year {self.season}"
