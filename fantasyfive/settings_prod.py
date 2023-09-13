@@ -14,3 +14,7 @@ DATABASES = {
         'PORT': ''
     }
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "https://www.fantasyfive.club"
+]
